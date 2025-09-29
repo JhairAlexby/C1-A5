@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:screen_protector/screen_protector.dart';
 import 'login_screen.dart';
+import 'screen_protection_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,6 +13,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _notificationsEnabled = true;
   bool _darkModeEnabled = false;
   String _selectedLanguage = 'Español';
+  final ScreenProtectionService _protectionService = ScreenProtectionService();
 
   @override
   void initState() {
@@ -27,19 +28,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _enableScreenshotProtection() async {
-    try {
-      await ScreenProtector.protectDataLeakageOn();
-    } catch (e) {
-      debugPrint('Error enabling screenshot protection: $e');
-    }
+    await _protectionService.enableProtection();
   }
 
   Future<void> _disableScreenshotProtection() async {
-    try {
-      await ScreenProtector.protectDataLeakageOff();
-    } catch (e) {
-      debugPrint('Error disabling screenshot protection: $e');
-    }
+    await _protectionService.disableProtection();
   }
 
   void _logout() {
@@ -57,7 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _disableScreenshotProtection().then((_) {
+                _protectionService.forceDisableProtection().then((_) {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const LoginScreen(),

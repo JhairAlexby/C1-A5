@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:screen_protector/screen_protector.dart';
 import 'profile_screen.dart';
 import 'login_screen.dart';
+import 'screen_protection_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
     'Planificar próximo sprint',
   ];
 
+  final ScreenProtectionService _protectionService = ScreenProtectionService();
+
   @override
   void initState() {
     super.initState();
@@ -33,19 +35,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _enableScreenshotProtection() async {
-    try {
-      await ScreenProtector.protectDataLeakageOn();
-    } catch (e) {
-      debugPrint('Error enabling screenshot protection: $e');
-    }
+    await _protectionService.enableProtection();
   }
 
   Future<void> _disableScreenshotProtection() async {
-    try {
-      await ScreenProtector.protectDataLeakageOff();
-    } catch (e) {
-      debugPrint('Error disabling screenshot protection: $e');
-    }
+    await _protectionService.disableProtection();
   }
 
   void _logout() {
@@ -63,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _disableScreenshotProtection().then((_) {
+                _protectionService.forceDisableProtection().then((_) {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) => const LoginScreen(),
